@@ -5,10 +5,16 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { ViewChild } from '@angular/core';
+import { CategoriesService } from '../../../service/categories';
+import { inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-categories',
-  imports:[ MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule],
+  imports:[ MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule,MatButtonModule,
+    RouterLink
+  ],
   templateUrl: './categories.html',
   styleUrl: './categories.scss'
 })
@@ -19,7 +25,16 @@ export class Categories {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  categoryService=inject(CategoriesService);
+constructor() {
+  this.dataSource = new MatTableDataSource<any>([]);
 
+}
+ngOnInit(){
+    this.categoryService.getCategories().subscribe((data:any)=>{
+    this.dataSource.data=data;
+  });
+}
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -35,3 +50,5 @@ export class Categories {
   }
 
 }
+
+
