@@ -1,25 +1,34 @@
 const express = require('express');
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
+const categoryRouter = require('./routes/category');
+
 const app = express();
 const port = 3000;
-const categoryRouter = require('./routes/category');
-app.get('/', (req, res) => {
-    res.send('server is running');
-});
-app.use("/categories",categoryRouter);
+
+// Middleware pour lire le JSON
 app.use(express.json());
 
-
-async function connectDB(){
-    await mongoose.connect('mongodb://localhost:27017',{
-        dbName:"SOA_project",
-    });
-    console.log("connected to DB");
-}
-connectDB().catch((err)=>{
-    console.error(err);
-})
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+// Routes
+app.get('/', (req, res) => {
+  res.send('Server is running');
 });
 
+app.use('/categories', categoryRouter);
+
+// Connexion à MongoDB
+async function connectDB() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/SOA_project');
+    console.log('✅ Connected to MongoDB');
+  } catch (err) {
+    console.error('❌ Database connection error:', err);
+    process.exit(1);
+  }
+}
+
+connectDB();
+
+// Lancement du serveur
+app.listen(port, () => {
+  console.log(`🚀 Server is running on http://localhost:${port}`);
+});

@@ -1,0 +1,8 @@
+[package]
+name = "soapui_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.11", features = ["json", "gzip", "tcp-tls"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
