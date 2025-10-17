@@ -1,22 +1,30 @@
 const Category = require('../db/caregory');
 const express = require('express');
+const { addCategory, updateCategory } = require('../handlers/category-handler');
 const router = express.Router();
 
-router.post("",async (req,res)=>{
-    console.log("here");
-    let model =req.body;
-    let category = new Category({
-        name:model.name,
-    });
-    category.save();
-    res.send(category.toObject());
-
+router.post("", async (req, res) => {
+  try {
+    const model = req.body;
+    const result = await addCategory(model);
+    res.status(201).send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Save failed' });
+  }
 });
-router.put("/:id",async (req,res)=>{
-    let model = req.body;
-    let id =req.params["id"];
-    await Category.findOneAndUpdate({_id:id},model);
-    res.send({message:"category updated"});
+
+router.put("/:id", async (req, res) => {
+  try {
+    const model = req.body;
+    const id = req.params["id"];
+    const updated = await updateCategory(id, model);
+    if (!updated) return res.status(404).json({ message: "category not found" });
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Update failed' });
+  }
 });
 
 module.exports = router;
