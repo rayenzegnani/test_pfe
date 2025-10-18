@@ -28,5 +28,16 @@ async function deleteProduct(id) {
     await Product.findByIdAndDelete(id);
     return;
 }
-
-module.exports = { addProduct, updateProduct , deleteProduct, getProductById, getProducts };
+async function getNewProducts(){
+    let newProduit=await Product.find({
+        isNewProduct:true,
+    });
+    return newProduit.map(np=>np.toObject());
+    }
+async function getFeaturedProducts(){
+    let featuredProducts=await Product.find({
+        isFeatured:true,
+    });
+    return featuredProducts.map(fp=>fp.toObject());
+    }
+module.exports = { addProduct, updateProduct , deleteProduct, getProductById, getProducts, getNewProducts, getFeaturedProducts };

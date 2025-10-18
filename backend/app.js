@@ -6,6 +6,8 @@ const port = 3000;
 const categoryRouter = require('./routes/category');
 const brandRouter = require('./routes/brand');
 const productRouter = require('./routes/product');
+const customerRouter = require('./routes/customer');
+const authRouter = require('./routes/auth');
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -15,7 +17,8 @@ app.get('/', (req, res) => {
 app.use('/categories', categoryRouter);
 app.use('/brands', brandRouter);
 app.use('/products', productRouter);
-
+app.use('/customers', customerRouter);
+app.use('/auth', authRouter);
 async function connectDB() {
   await mongoose.connect('mongodb://localhost:27017', {
     dbName: 'SOA_project',
