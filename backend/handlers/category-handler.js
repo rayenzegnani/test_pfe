@@ -1,4 +1,4 @@
-const category=require('../db/caregory');
+const Category = require('../db/caregory'); // <-- importer le modèle (remarque : le fichier DB s'appelle caregory.js)
 
 async function addCategory(model) {
   try {
@@ -20,4 +20,18 @@ async function updateCategory(id, model) {
     throw err;
   }
 }
-module.exports = { addCategory, updateCategory };
+async function getCategoryById(id) {
+  let category = await Category.findById(id);
+  return category.toObject();
+}
+async function getCategories(){
+  let categories = await Category.find();
+  return categories.map(cat => cat.toObject());
+}
+async function deleteCategory(id) {
+  
+    await Category.findByIdAndDelete(id);
+    return;
+}
+
+module.exports = { addCategory, updateCategory , deleteCategory, getCategoryById, getCategories };

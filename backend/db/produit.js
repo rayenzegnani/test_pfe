@@ -4,9 +4,12 @@ const produitSchema = new mongoose.Schema({
     shotDescription :String,
     description:String,
     purchagePrice:Number,
+    discount: Number,
     images:Array(String),
-    categoryId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }]
-    
+    categoryId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+    brandId:{ type: mongoose.Schema.Types.ObjectId, ref: 'Brand' },
+    isFeatured:Boolean,
+    isNew:Boolean,
 });
 
 module.exports = mongoose.model('Produit', produitSchema);
