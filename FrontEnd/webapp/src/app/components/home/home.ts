@@ -8,4 +8,13 @@ import { Component } from '@angular/core';
 })
 export class Home {
 
+  cartItemsCount = 2;
+
+  
+
+  addToCart(product: any) {
+    console.log('Adding to cart:', product);
+    this.cartItemsCount++;
+  }
 }
+
