@@ -10,6 +10,24 @@ const customerRouter = require('./routes/customer');
 const authRouter = require('./routes/auth');
 app.use(express.json());
 
+// Simple CORS middleware to allow requests from the Angular dev server
+app.use((req, res, next) => {
+  // allow your frontend origin (change to '*' only for debugging)
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
 app.get('/', (req, res) => {
   res.send('server is running');
 });

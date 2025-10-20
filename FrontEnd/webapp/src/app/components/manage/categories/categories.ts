@@ -26,13 +26,26 @@ export class Categories {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   categoryService=inject(CategoriesService);
+row_id: any;
 constructor() {
   this.dataSource = new MatTableDataSource<any>([]);
 
 }
-ngOnInit(){
-    this.categoryService.getCategories().subscribe((data:any)=>{
-    this.dataSource.data=data;
+Delete(row_id:string){
+  this.categoryService.DeletCategory(row_id).subscribe((data:any)=>{
+    console.log("deleted",data);
+    alert("category Deleted");
+    this.getServerData();
+  });
+}
+
+ngOnInit(): void {
+  this.getServerData();
+}
+
+private getServerData(): void {
+  this.categoryService.getCategories().subscribe((data:any) => {
+    this.dataSource.data = data;
   });
 }
   ngAfterViewInit() {

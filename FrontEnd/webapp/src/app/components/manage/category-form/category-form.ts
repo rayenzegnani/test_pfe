@@ -27,16 +27,25 @@ export class CategoryForm {
   isSubmitting = false;
   categoryService= inject(CategoriesService);
   IsEditMode=false;
+  categoryId: string | null = null;
   route=inject(ActivatedRoute);
     ngOnInit() {
-      let id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        this.IsEditMode=true;
-        this.categoryService.getCategoriesById(id).subscribe((data:any)=>{
-        console.log(data);
+      // subscribe to paramMap so we handle route reuse and dynamic params
+      this.route.paramMap.subscribe((pm) => {
+        const id = pm.get('id');
+        this.categoryId = id;
+        if (id) {
+          this.IsEditMode = true;
+          this.categoryService.getCategoriesById(id).subscribe((data: any) => {
+            console.log(data);
+            this.categoryForm.patchValue({ name: data?.name ?? '' });
           });
+        } else {
+          this.IsEditMode = false;
+          this.categoryForm.reset();
         }
-      }
+      });
+    }
 
     
   constructor(
@@ -58,7 +67,8 @@ export class CategoryForm {
     
       
    
-     this.categoryService.createCategory(formData).subscribe((result:any)=>{
+     const categoryData = { name: this.categoryForm.get('name')?.value };
+     this.categoryService.createCategory(categoryData).subscribe((result:any)=>{
       alert('Category created successfully!');
       console.log('Category created:', result);
      });
@@ -73,15 +83,44 @@ export class CategoryForm {
         // Navigate back to categories list or show success message
         this.router.navigate(['/admin/category']);
       }, 1500);
-
-
     }
+    
   }
 
+    Update(){
+    // ensure we have an id (try stored value, then route snapshot)
+    let id = this.categoryId ?? this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      console.error('Cannot update category: missing id');
+      alert('Update failed: missing category id');
+      return;
+    }
+
+    const categoryData = { id: id, name: this.categoryForm.get('name')?.value };
+    // call update and handle errors
+    this.categoryService.UpdateCategory(categoryData).subscribe({
+      next: (result:any) => {
+        alert('Category updated successfully!');
+        console.log('Category updated:', result);
+        this.router.navigate(['/admin/category']);
+      },
+      error: (err:any) => {
+        console.error('Update request failed', err);
+        alert('Update failed: ' + (err?.error?.error || err?.message || 'Unknown error'));
+      }
+    });
+ 
+  }
+   
+     
+  
+
+  
 
 
-  onCancel() {
+  oncancel(){
     this.router.navigate(['/admin/category']);
   }
+
 
 }

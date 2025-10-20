@@ -13,13 +13,24 @@ export class CategoriesService {
     
   }
   getCategories(){
-    return this.http.get("http://localhost:3000/category");
+    return this.http.get("http://localhost:3000/categories");
   }
-  createCategory(categoryData: FormData){
-     return this.http.post("http://localhost:3000/category", categoryData);
+  // Send plain JSON with category fields (backend expects JSON)
+  createCategory(categoryData: { name: string }){
+     return this.http.post("http://localhost:3000/categories", categoryData);
   }
   getCategoriesById(id:string){
-    return this.http.get("http://localhost:3000/category+'/'+id);");
+    return this.http.get(`http://localhost:3000/categories/${id}`);
   }
+    UpdateCategory(categoryData: { name: string,id:string }){
+     const { id, name } = categoryData;
+     return this.http.put(`http://localhost:3000/categories/${id}`, {
+      name: name
+     });
+  }
+    DeletCategory(id:string ){
+     
+     return this.http.delete(`http://localhost:3000/categories/${id}`);
+    }
   
 }
