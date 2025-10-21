@@ -32,5 +32,6 @@ export class CategoriesService {
      
      return this.http.delete(`http://localhost:3000/categories/${id}`);
     }
+    
   
 }

@@ -1,0 +1,113 @@
+// Signup Component Styles
+
+// Custom scrollbar for the page
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #3b82f6, #9333ea, #ec4899);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #2563eb, #7c3aed, #db2777);
+}
+
+// Smooth transitions for form fields
+input {
+  transition: all 0.2s ease-in-out;
+  
+  &:focus {
+    transform: translateY(-1px);
+  }
+}
+
+// Checkbox styling
+input[type="checkbox"] {
+  transition: all 0.15s ease-in-out;
+  
+  &:checked {
+    background-color: #9333ea;
+    border-color: #9333ea;
+  }
+  
+  &:focus {
+    outline-color: #9333ea;
+  }
+}
+
+// Button hover effects
+button {
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+// Card shadow on hover
+.bg-white.rounded-2xl {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+}
+
+// Animation for error and success messages
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rounded-lg.bg-red-50,
+.rounded-lg.bg-green-50 {
+  animation: slideIn 0.3s ease-out;
+}
+
+// Social button hover effects
+.grid button {
+  transition: all 0.15s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Gradient background animation
+.bg-gradient-to-br {
+  animation: gradient 15s ease infinite;
+  background-size: 400% 400%;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// Password strength indicator animation
+.h-1.flex-1 {
+  transition: all 0.3s ease-in-out;
+}
