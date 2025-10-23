@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
+const cookieParser = require('cookie-parser');
 const port = 3000;
 
 const categoryRouter = require('./routes/category');
@@ -9,6 +10,7 @@ const productRouter = require('./routes/product');
 const customerRouter = require('./routes/customer');
 const authRouter = require('./routes/auth');
 app.use(express.json());
+app.use(cookieParser());
 
 // Simple CORS middleware to allow requests from the Angular dev server
 app.use((req, res, next) => {
