@@ -90,7 +90,7 @@ export class Signup implements OnInit {
     const signupData = {
       fullName: this.signupForm.get('fullName')?.value,
       email: this.signupForm.get('email')?.value,  
-      password: this.signupForm.get('password')?.value
+      hashedpassword: this.signupForm.get('password')?.value
     };
 
     // Call the actual service

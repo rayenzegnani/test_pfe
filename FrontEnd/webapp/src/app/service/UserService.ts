@@ -10,12 +10,12 @@ export class UserService {
 
     constructor() {}
 
-    AddUser(userData: { fullName: string, email: string, password: string }){
+    AddUser(userData: { fullName: string, email: string, hashedpassword: string }){
        // Map fullName to nom for backend compatibility
        const backendData = {
          nom: userData.fullName,
          email: userData.email,
-         password: userData.password
+         password: userData.hashedpassword
        };
        return this.http.post("http://localhost:3000/auth/register", backendData);
     }

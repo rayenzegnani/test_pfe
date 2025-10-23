@@ -6,17 +6,13 @@ const JWT_SECRET = 'votre_secret_jwt'; // Mets une vraie valeur secrète en prod
 
 async function registerUser(model) {
     const hashedPassword = await bcrypt.hash(model.password, 10);
-<<<<<<< HEAD
+
     let newUser=new User({
         nom:model.nom,
         email:model.email,
         password:hashedPassword,
-=======
-    let newUser = new User({
-        username: model.username,
-        email: model.email,
-        password: hashedPassword,
->>>>>>> b8fbe8207b2c25ab6605c72477344a6405d290b2
+
+
     });
     await newUser.save();
 }
