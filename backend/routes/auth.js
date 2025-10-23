@@ -42,4 +42,4 @@ router.post('/logout', (req, res) => {
     return res.status(400).json({ error: 'Unable to logout' });
 });
 
-module.exports = router;
+module.exports = router; 
