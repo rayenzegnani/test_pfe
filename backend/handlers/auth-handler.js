@@ -8,7 +8,7 @@ async function registerUser(model) {
     const hashedPassword = await bcrypt.hash(model.password, 10);
 
     let newUser=new User({
-        nom:model.nom,
+        username:model.username,
         email:model.email,
         password:hashedPassword,
 

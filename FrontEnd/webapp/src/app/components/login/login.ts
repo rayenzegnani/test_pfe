@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-
+import { inject } from '@angular/core';
+import { UserService } from '../../service/UserService';
 @Component({
   selector: 'app-login',
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
@@ -10,10 +11,12 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login implements OnInit {
+   userService = inject(UserService);
   loginForm!: FormGroup;
   showPassword = false;
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -38,38 +41,23 @@ export class Login implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
+
 
     const loginData = {
       email: this.loginForm.get('email')?.value,
       password: this.loginForm.get('password')?.value,
-      rememberMe: this.loginForm.get('rememberMe')?.value
-    };
-
-    // TODO: Replace with actual authentication service call
-    // Example:
-    // this.authService.login(loginData).subscribe({
-    //   next: (response) => {
-    //     this.isLoading = false;
-    //     // Store token, user data, etc.
-    //     this.router.navigate(['/']);
-    //   },
-    //   error: (error) => {
-    //     this.isLoading = false;
-    //     this.errorMessage = error.error?.message || 'Invalid email or password';
-    //   }
-    // });
-
-    // Temporary simulation (remove when implementing real authentication)
-    setTimeout(() => {
-      this.isLoading = false;
       
-      // Simulate successful login
-      if (loginData.email === 'admin@example.com' && loginData.password === 'password') {
-        console.log('Login successful:', loginData);
-        this.router.navigate(['/admin/category']);
-      } else {
-        this.errorMessage = 'Invalid email or password. Try: admin@example.com / password';
-      }
-    }, 1500);
+    };
+    
+      this.userService.loginUser(loginData).subscribe({
+        next: (result: any) => {
+        console.log('Login successful:', result);
+        this.isLoading = false;
+        this.successMessage = result.message || 'Login successful! Redirecting...';
+        this.router.navigate(['/']);
+  }});
+
+   
   }
 }
