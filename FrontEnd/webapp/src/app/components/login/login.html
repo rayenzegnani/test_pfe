@@ -13,8 +13,52 @@
         <p class="mt-2 text-blue-100">Sign in to your account</p>
       </div>
 
+      <!-- User/Admin Toggle Tabs -->
+      <div class="bg-gray-50 px-8 pt-6">
+        <div class="flex space-x-2 bg-gray-200 rounded-lg p-1">
+          <button
+            type="button"
+            (click)="loginType = 'user'"
+            [class.bg-white]="loginType === 'user'"
+            [class.shadow-md]="loginType === 'user'"
+            [class.text-blue-600]="loginType === 'user'"
+            [class.font-semibold]="loginType === 'user'"
+            class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-600 transition-all duration-200"
+          >
+            <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            User Login
+          </button>
+          <button
+            type="button"
+            (click)="loginType = 'admin'"
+            [class.bg-white]="loginType === 'admin'"
+            [class.shadow-md]="loginType === 'admin'"
+            [class.text-purple-600]="loginType === 'admin'"
+            [class.font-semibold]="loginType === 'admin'"
+            class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium text-gray-600 transition-all duration-200"
+          >
+            <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            Admin Login
+          </button>
+        </div>
+      </div>
+
       <!-- Form Section -->
       <div class="px-8 py-10">
+        <!-- Login Type Indicator -->
+        <div class="mb-6 p-3 rounded-lg" [class.bg-blue-50]="loginType === 'user'" [class.bg-purple-50]="loginType === 'admin'">
+          <p class="text-sm text-center" [class.text-blue-700]="loginType === 'user'" [class.text-purple-700]="loginType === 'admin'">
+            <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            Signing in as <strong>{{ loginType === 'admin' ? 'Administrator' : 'User' }}</strong>
+          </p>
+        </div>
+
         <form class="space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <!-- Email Field -->
           <div>

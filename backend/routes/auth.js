@@ -4,26 +4,79 @@ const { registerUser, loginUser, logout } = require('../handlers/auth-handler');
 
 // Register
 router.post('/register', async (req, res) => {
-    const { username, nom, email, password } = req.body;
-    const userName = username || nom;
-    if (!userName || !email || !password) {
-        return res.status(400).json({ error: 'Missing required fields' });
+    try {
+        const { nom, email, password, isAdmin } = req.body;
+        
+        console.log('Registration request:', { nom, email, hasPassword: !!password, isAdmin });
+        
+        // Validate required fields
+        if (!nom || !email || !password) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Missing required fields (nom, email, password)' 
+            });
+        }
+        
+        const result = await registerUser({ nom, email, password, isAdmin });
+        
+        res.status(201).json({ 
+            success: true,
+            message: 'User registered successfully',
+            data: result
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            return res.status(409).json({ 
+                success: false,
+                message: 'A user with this email already exists' 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false,
+            message: error.message || 'Registration failed' 
+        });
     }
-    await registerUser({ username: userName, email, password });
-    res.status(201).json({ message: 'User registered successfully' });
 });
 
 // Login
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
+    try {
+        const { email, password } = req.body;
+        
+        console.log('Login request:', { email });
+        
+        if (!email || !password) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email and password are required' 
+            });
+        }
+        
+        const result = await loginUser(email, password);
+        
+        if (!result) {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            ...result
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: error.message || 'Login failed' 
+        });
     }
-    const result = await loginUser(email, password);
-    if (!result) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    res.status(200).json(result);
 });
 
 // Logout

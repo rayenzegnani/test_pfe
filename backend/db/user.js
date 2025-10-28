@@ -1,11 +1,31 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    isAdmin: { type: Boolean, default: false }
+const userSchema = new mongoose.Schema({
+  nom: {
+    type: String,
+    required: true,
+    unique: false  // Allow duplicate names
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,  // Emails must be unique
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false  // Default users are not admins
+  }
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+// Don't create separate index - unique: true already creates one
+
+const userModel = mongoose.model("user", userSchema);
+
+module.exports = userModel;
