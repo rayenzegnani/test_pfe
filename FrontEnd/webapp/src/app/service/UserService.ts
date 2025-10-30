@@ -7,6 +7,7 @@ import { Injectable,inject } from '@angular/core';
 export class UserService {
 
     http=inject(HttpClient);
+    private apiUrl = 'http://localhost:3000';
 
     constructor() {}
 
@@ -17,10 +18,24 @@ export class UserService {
          email: userData.email,
          password: userData.password
        };
-       return this.http.post("http://localhost:3000/auth/register", backendData);
+       return this.http.post(`${this.apiUrl}/auth/register`, backendData);
     }
+    
     loginUser(userData:{ email: string, password: string }) {
-      return this.http.post("http://localhost:3000/auth/login",userData);
+      return this.http.post(`${this.apiUrl}/auth/login`,userData);
+    }
 
-}
+    getAllUsers() {
+      return this.http.get(`${this.apiUrl}/users`);
+    }
+
+    getUserById(id: string) {
+      return this.http.get(`${this.apiUrl}/users/${id}`);
+    }
+
+    deleteUser(id: string) {
+      return this.http.delete(`${this.apiUrl}/users/${id}`);
+    }
+
+ 
 }

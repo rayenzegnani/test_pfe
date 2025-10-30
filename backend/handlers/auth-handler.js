@@ -47,6 +47,10 @@ async function loginUser(email, password) {
         if (!isPasswordValid) {
             return null;
         }
+
+        // Update lastLogin timestamp
+        user.lastLogin = new Date();
+        await user.save();
         
         // Generate JWT token
         const token = jwt.sign(
@@ -55,7 +59,7 @@ async function loginUser(email, password) {
             { expiresIn: '1h' }
         );
         
-        // Return user data without password, including isAdmin status
+        // Return user data without password, including isAdmin status and lastLogin
         return {
             token,
             user: {
@@ -63,6 +67,7 @@ async function loginUser(email, password) {
                 nom: user.nom,
                 email: user.email,
                 isAdmin: user.isAdmin,
+                lastLogin: user.lastLogin,
                 createdAt: user.createdAt
             }
         };

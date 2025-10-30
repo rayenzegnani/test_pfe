@@ -9,6 +9,7 @@ const brandRouter = require('./routes/brand');
 const productRouter = require('./routes/product');
 const customerRouter = require('./routes/customer');
 const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
 app.use(express.json());
 app.use(cookieParser());
 
@@ -39,6 +40,7 @@ app.use('/brands', brandRouter);
 app.use('/products', productRouter);
 app.use('/customers', customerRouter);
 app.use('/auth', authRouter);
+app.use('/users', userRouter);
 async function connectDB() {
   await mongoose.connect('mongodb://localhost:27017', {
     dbName: 'SOA_project',

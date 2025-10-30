@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
   isAdmin: {
     type: Boolean,
     default: false  // Default users are not admins
+  },
+  lastLogin: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 
