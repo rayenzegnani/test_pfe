@@ -84,12 +84,13 @@ export class Login implements OnInit {
           }
         }
 
-        // Redirect based on login type
+      
         setTimeout(() => {
           if (this.loginType === 'admin' && result.user?.isAdmin) {
-            this.router.navigate(['/admin/category']);  // Admin dashboard
-          } else {
-            this.router.navigate(['/']);  // User home page
+            this.router.navigate(['/admin/category']);  
+          }
+          else if(this.loginType==='user' &&(result.user?.isAdmin==false) ){
+            this.router.navigate(['/']);
           }
         }, 1000);
       },

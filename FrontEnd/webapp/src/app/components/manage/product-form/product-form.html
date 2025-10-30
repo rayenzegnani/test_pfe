@@ -1,0 +1,127 @@
+<div class="max-w-4xl mx-auto p-6">
+  <div class="bg-white shadow-md rounded-lg p-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">
+      {{ isEditMode ? 'Edit Product' : 'Add New Product' }}
+    </h1>
+
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <!-- Product Name -->
+      <mat-form-field appearance="outline" class="w-full mb-4">
+        <mat-label>Product Name</mat-label>
+        <input matInput formControlName="name" placeholder="Enter product name">
+        <mat-error *ngIf="productForm.get('name')?.hasError('required')">
+          Product name is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Price and Discount Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Price ($)</mat-label>
+          <input matInput type="number" formControlName="purchagePrice" placeholder="0.00" step="0.01" min="0">
+          <mat-error *ngIf="productForm.get('purchagePrice')?.hasError('required')">
+            Price is required
+          </mat-error>
+          <mat-error *ngIf="productForm.get('purchagePrice')?.hasError('min')">
+            Price must be positive
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Discount (%)</mat-label>
+          <input matInput type="number" formControlName="discount" placeholder="0" step="1" min="0" max="100">
+          <mat-error *ngIf="productForm.get('discount')?.hasError('min')">
+            Discount cannot be negative
+          </mat-error>
+          <mat-error *ngIf="productForm.get('discount')?.hasError('max')">
+            Discount cannot exceed 100%
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Category Selection -->
+      <mat-form-field appearance="outline" class="w-full mb-4">
+        <mat-label>Categories</mat-label>
+        <mat-select formControlName="categoryId" multiple>
+          <mat-option *ngFor="let category of categories" [value]="category._id">
+            {{ category.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="productForm.get('categoryId')?.hasError('required')">
+          At least one category is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Product Images Section -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-3">Product Images</label>
+        
+        <!-- Image Upload Buttons -->
+        <div class="flex gap-3 mb-4">
+          <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            Upload Image
+            <input type="file" class="hidden" accept="image/*" multiple (change)="onFileSelected($event)">
+          </label>
+          
+          <button type="button" mat-stroked-button (click)="addImageUrl()" class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+            </svg>
+            Add URL
+          </button>
+        </div>
+
+        <!-- Image Previews -->
+        <div *ngIf="imagePreviewUrls.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div *ngFor="let imageUrl of imagePreviewUrls; let i = index" class="relative group">
+            <img [src]="imageUrl" alt="Product image" class="w-full h-32 object-cover rounded-lg border-2 border-gray-200">
+            <button 
+              type="button"
+              (click)="removeImage(i)"
+              class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- No Images Message -->
+        <div *ngIf="imagePreviewUrls.length === 0" class="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+          <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <p class="text-sm text-gray-500">No images added yet</p>
+        </div>
+      </div>
+
+      <!-- Checkboxes -->
+      <div class="mb-6 space-y-3">
+        <div>
+          <mat-checkbox formControlName="isFeatured" class="text-gray-700">
+            Featured Product
+          </mat-checkbox>
+        </div>
+        <div>
+          <mat-checkbox formControlName="isNewProduct" class="text-gray-700">
+            New Product
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-4 justify-end">
+        <button mat-raised-button type="button" (click)="onCancel()" class="px-6">
+          Cancel
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="productForm.invalid" class="px-6">
+          {{ isEditMode ? 'Update Product' : 'Add Product' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

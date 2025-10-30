@@ -6,6 +6,7 @@ import { Login } from './components/login/login';
 import { Signup } from './components/signup/signup';
 import { AdminLayout } from './components/manage/admin-layout/admin-layout';
 import { Product } from './components/manage/product/product';
+import { ProductForm } from './components/manage/product-form/product-form';
 import { Dashbord } from './components/manage/dashbord/dashbord';
 import { Income } from './components/manage/income/income';
 import { User } from './components/manage/user/user';
@@ -24,7 +25,9 @@ export const routes: Routes = [
             { path: 'category', component: Categories },
             { path: 'category/add', component: CategoryForm },
             { path: 'category/:id', component: CategoryForm },
-            { path: 'products', component: Product }, // Placeholder - will create Products component later
+            { path: 'product', component: Product },
+            { path: 'product/add', component: ProductForm },
+            { path: 'product/:id', component: ProductForm },
             { path: 'income', component: Income }, // Placeholder - will create Income component later
             { path: 'users', component: User }, // Placeholder - will create Users component later
             { path: 'settings', component: Settings } // Placeholder - will create Settings component later

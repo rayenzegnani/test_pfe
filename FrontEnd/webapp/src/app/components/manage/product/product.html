@@ -1,1 +1,171 @@
-<p>product works!</p>
+<div class="shadow-md rounded-lg bg-white p-4 flex flex-col">
+  <div class="flex justify-between">
+    <h1 class="text-2xl mt-10 ml-10 font-bold">Manage Products</h1>
+    <button mat-raised-button color="accent" routerLink="/admin/product/add">Add new Product</button>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="mb-4">
+    <mat-form-field class="w-full">
+      <mat-label class="text-gray-600">Filter</mat-label>
+      <input 
+        matInput 
+        (keyup)="applyFilter($event)" 
+        placeholder="Search products..." 
+        #input
+        class="text-gray-800">
+    </mat-form-field>
+  </div>
+
+  <!-- Table Container -->
+  <div class="overflow-x-auto border border-gray-200 rounded-lg">
+    <table mat-table [dataSource]="dataSource" matSort class="w-full">
+
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            mat-sort-header 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left cursor-pointer hover:bg-gray-100 transition-colors">
+          ID
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 text-gray-600 border-t border-gray-200">
+          {{row._id || row.id}}
+        </td>
+      </ng-container>
+
+      <!-- Image Column -->
+      <ng-container matColumnDef="image">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left">
+          Image
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 border-t border-gray-200">
+          <img 
+            *ngIf="row.images && row.images.length > 0" 
+            [src]="row.images[0]" 
+            [alt]="row.name"
+            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+            onerror="this.src='https://via.placeholder.com/64?text=No+Image'">
+          <div 
+            *ngIf="!row.images || row.images.length === 0"
+            class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            mat-sort-header 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left cursor-pointer hover:bg-gray-100 transition-colors">
+          Name
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 text-gray-800 font-medium border-t border-gray-200">
+          {{row.name}}
+        </td>
+      </ng-container>
+
+      <!-- Price Column -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            mat-sort-header 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left cursor-pointer hover:bg-gray-100 transition-colors">
+          Price
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 text-gray-800 border-t border-gray-200">
+          ${{row.purchagePrice || 0}}
+        </td>
+      </ng-container>
+
+      <!-- Discount Column -->
+      <ng-container matColumnDef="discount">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            mat-sort-header 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left cursor-pointer hover:bg-gray-100 transition-colors">
+          Discount
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 text-gray-800 border-t border-gray-200">
+          {{row.discount || 0}}%
+        </td>
+      </ng-container>
+
+      <!-- Featured Column -->
+      <ng-container matColumnDef="featured">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            mat-sort-header 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left cursor-pointer hover:bg-gray-100 transition-colors">
+          Featured
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 border-t border-gray-200">
+          <span *ngIf="row.isFeatured" class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">Yes</span>
+          <span *ngIf="!row.isFeatured" class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">No</span>
+        </td>
+      </ng-container>
+
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell 
+            *matHeaderCellDef 
+            class="px-4 py-3 bg-gray-50 text-gray-700 font-semibold text-left">
+          Action
+        </th>
+        <td mat-cell 
+            *matCellDef="let row" 
+            class="px-4 py-3 text-gray-600 border-t border-gray-200">
+          <button mat-raised-button color="accent" [routerLink]="['/admin/product', row._id || row.id]" class="mr-2">Edit</button>
+          <button mat-raised-button color="warn" (click)="Delete(row._id || row.id)">Delete</button> 
+        </td>
+      </ng-container>
+
+      <!-- Header Row -->
+      <tr mat-header-row 
+          *matHeaderRowDef="displayedColumns" 
+          class="bg-gray-50"></tr>
+      
+      <!-- Data Rows -->
+      <tr mat-row 
+          *matRowDef="let row; columns: displayedColumns;" 
+          class="hover:bg-gray-50 transition-colors cursor-pointer border-t border-gray-200"></tr>
+
+      <!-- No Data Row -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="px-4 py-6 text-center text-gray-500 italic border-t border-gray-200" [attr.colspan]="displayedColumns.length">
+          No products matching the filter "{{input.value}}"
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <div class="mt-4">
+    <mat-paginator 
+      [pageSizeOptions]="[5, 10, 25, 100]" 
+      [pageSize]="10"
+      showFirstLastButtons
+      class="bg-white rounded-lg border border-gray-200"
+      aria-label="Select page of products">
+    </mat-paginator>
+  </div>
+
+</div>
