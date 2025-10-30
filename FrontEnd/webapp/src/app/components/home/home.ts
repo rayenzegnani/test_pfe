@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ProductService } from '../../service/product';
+import { CategoriesService } from '../../service/categories';
 
 @Component({
   selector: 'app-home',
@@ -9,57 +11,49 @@ import { RouterLink } from '@angular/router';
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
-export class Home {
+export class Home implements OnInit {
 
   cartItemsCount = 1;
+  products: any[] = [];
+  categories: any[] = [];
 
-  categories = [
-    { name: 'Living Room' },
-    { name: 'Workspace' },
-    { name: 'Outdoor Oasis' },
-    { name: 'Wellness' },
-    { name: 'Tech Essentials' },
-    { name: 'Kitchen Classics' }
-  ];
+  productService = inject(ProductService);
+  categoriesService = inject(CategoriesService);
 
-  products = [
-    {
-      name: 'Aurora Lounge Chair',
-      category: 'Living Room',
-      price: '$189.00',
-      image: 'https://images.unsplash.com/photo-1616628182501-e2f6f8c6df5b?auto=format&fit=crop&w=900&q=80'
-    },
-    {
-      name: 'Nordic Floor Lamp',
-      category: 'Lighting',
-      price: '$129.00',
-      image: 'https://images.unsplash.com/photo-1505692794403-55b39f47b1a4?auto=format&fit=crop&w=900&q=80'
-    },
-    {
-      name: 'Siena Ceramic Set',
-      category: 'Kitchen',
-      price: '$74.50',
-      image: 'https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=900&q=80'
-    },
-    {
-      name: 'Willow Knit Throw',
-      category: 'Textiles',
-      price: '$58.00',
-      image: 'https://images.unsplash.com/photo-1505691723518-36a5ac3be353?auto=format&fit=crop&w=900&q=80'
-    },
-    {
-      name: 'Studio Desk Setup',
-      category: 'Workspace',
-      price: '$249.00',
-      image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80'
-    },
-    {
-      name: 'Bloom Fragrance Diffuser',
-      category: 'Wellness',
-      price: '$42.00',
-      image: 'https://images.unsplash.com/photo-1523292562811-8fa7962a78c8?auto=format&fit=crop&w=900&q=80'
-    }
-  ];
+  ngOnInit(): void {
+    this.loadProducts();
+    this.loadCategories();
+  }
+
+  private loadProducts(): void {
+    this.productService.getProducts().subscribe({
+      next: (data: any) => {
+        // Map the product data to include proper image URL and price formatting
+        this.products = data.map((product: any) => ({
+          ...product,
+          image: product.images && product.images.length > 0 
+            ? product.images[0] 
+            : 'https://via.placeholder.com/400x300?text=No+Image',
+          price: `$${product.purchagePrice || 0}`,
+          category: product.categoryId || 'Uncategorized'
+        }));
+      },
+      error: (err) => {
+        console.error('Error loading products:', err);
+      }
+    });
+  }
+
+  private loadCategories(): void {
+    this.categoriesService.getCategories().subscribe({
+      next: (data: any) => {
+        this.categories = data;
+      },
+      error: (err) => {
+        console.error('Error loading categories:', err);
+      }
+    });
+  }
 
   addToCart(product: any) {
     console.log('Adding to cart:', product);
