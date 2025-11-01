@@ -1,32 +1,31 @@
-const Brand=require('../db/brand');
+const Brand = require('../db/brand');
 
 async function addBrand(model) {
-  let brand = new Brand({
-    name: model.name,
-  });
-  await brand.save();
-  return brand.toObject();
+  const id = await Brand.create({ name: model.name });
+  return Brand.findById(id);
 }
 
 async function updateBrand(id, model) {
-  let updated = await Brand.findByIdAndUpdate(id, model, { new: true });
-  return updated ? updated.toObject() : null;
+  return Brand.update(id, model);
 }
 
 async function getBrandById(id) {
-  let brand = await Brand.findById(id);
-  return brand.toObject();
+  return Brand.findById(id);
 }
 
-async function getBrands(){
-  let brands = await Brand.find();
-  return brands.map(br => br.toObject());
+async function getBrands() {
+  return Brand.findAll();
 }
 
 async function deleteBrand(id) {
-  
-    await Brand.findByIdAndDelete(id);
-    return;
+  await Brand.delete(id);
+  return true;
 }
 
-module.exports = { addBrand, updateBrand , deleteBrand, getBrandById, getBrands };
+module.exports = {
+  addBrand,
+  updateBrand,
+  deleteBrand,
+  getBrandById,
+  getBrands,
+};

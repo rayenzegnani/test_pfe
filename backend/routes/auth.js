@@ -1,45 +1,79 @@
 const express = require('express');
 const router = express.Router();
 const { registerUser, loginUser, logout } = require('../handlers/auth-handler');
+const authMiddleware = require('../middleware/auth-middleware');
+const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 
-// Register
+// ... La route /register reste la même ...
 router.post('/register', async (req, res) => {
-    const { username, nom, email, password } = req.body;
-    const userName = username || nom;
-    if (!userName || !email || !password) {
-        return res.status(400).json({ error: 'Missing required fields' });
+    try {
+        const { nom, email, password, role } = req.body;
+        if (!nom || !email || !password) {
+            return res.status(400).json({ error: 'Name, email, and password are required' });
+        }
+        const userRole = (String(role).toLowerCase() === 'true');
+        await registerUser({ nom, email, password, role: userRole });
+        
+        const result = await loginUser(email, password);
+        if (!result) {
+            return res.status(401).json({ error: 'Invalid credentials after registration' });
+        }
+
+        generateTokenAndSetCookie(res, result.user._id, result.user.email, result.user.role);
+
+        res.status(201).json({ message: 'User registered successfully', user: result.user });
+
+    } catch (err) {
+        console.error('REGISTER ERROR:', err.message);
+        if (err.message === 'Email already in use') {
+            return res.status(409).json({ error: err.message });
+        }
+        res.status(500).json({ error: 'Registration failed' });
     }
-    await registerUser({ username: userName, email, password });
-    res.status(201).json({ message: 'User registered successfully' });
 });
 
-// Login
+
+// Route de connexion (publique)
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        const result = await loginUser(email, password);
+        if (!result) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        // Génère le token et le place dans un cookie HttpOnly
+        generateTokenAndSetCookie(res, result.user._id, result.user.email, result.user.role);
+
+        res.status(200).json({ user: result.user }); // Ne retourne plus le token dans le JSON
+
+    } catch (err) {
+        console.error('LOGIN ERROR:', err);
+        res.status(500).json({ error: 'Login failed' });
     }
-    const result = await loginUser(email, password);
-    if (!result) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    res.status(200).json(result);
 });
 
-// Logout
+// Route de déconnexion (protégée)
 router.post('/logout', (req, res) => {
-    const authHeader = req.headers.authorization || '';
-    const tokenFromHeader = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-    const token = tokenFromHeader || (req.cookies && req.cookies.token);
+    try {
+        const token = req.cookies.jwt;
+        if (token) {
+            logout(token);
+        }
 
-    if (!token) {
-        return res.status(400).json({ error: 'No token provided' });
+        res.cookie('jwt', '', {
+            httpOnly: true,
+            expires: new Date(0),
+        });
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (err) {
+        console.error('LOGOUT ERROR:', err);
+        res.status(500).json({ error: 'Logout failed' });
     }
-
-    const ok = logout(token);
-    try { res.clearCookie('token'); } catch (e) {}
-    if (ok) return res.status(200).json({ message: 'Logged out' });
-    return res.status(400).json({ error: 'Unable to logout' });
 });
 
-module.exports = router; 
+module.exports = router;

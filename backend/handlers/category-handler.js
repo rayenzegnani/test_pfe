@@ -1,10 +1,9 @@
-const Category = require('../db/caregory'); // <-- importer le modèle (remarque : le fichier DB s'appelle caregory.js)
+const Category = require('../db/caregory');
 
 async function addCategory(model) {
   try {
-    const category = new Category({ name: model.name });
-    await category.save();
-    return category.toObject();
+    const id = await Category.create({ name: model.name });
+    return Category.findById(id);
   } catch (err) {
     console.error('addCategory error:', err);
     throw err;
@@ -13,25 +12,30 @@ async function addCategory(model) {
 
 async function updateCategory(id, model) {
   try {
-    const updated = await Category.findByIdAndUpdate(id, model, { new: true });
-    return updated ? updated.toObject() : null;
+    return Category.update(id, model);
   } catch (err) {
     console.error('updateCategory error:', err);
     throw err;
   }
 }
+
 async function getCategoryById(id) {
-  let category = await Category.findById(id);
-  return category.toObject();
-}
-async function getCategories(){
-  let categories = await Category.find();
-  return categories.map(cat => cat.toObject());
-}
-async function deleteCategory(id) {
-  
-    await Category.findByIdAndDelete(id);
-    return;
+  return Category.findById(id);
 }
 
-module.exports = { addCategory, updateCategory , deleteCategory, getCategoryById, getCategories };
+async function getCategories() {
+  return Category.findAll();
+}
+
+async function deleteCategory(id) {
+  await Category.delete(id);
+  return true;
+}
+
+module.exports = {
+  addCategory,
+  updateCategory,
+  deleteCategory,
+  getCategoryById,
+  getCategories,
+};

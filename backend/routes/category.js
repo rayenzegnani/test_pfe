@@ -1,9 +1,15 @@
 
 const express = require('express');
-const { addCategory, updateCategory ,deleteCategory,getCategories,getCategoryById} = require('../handlers/category-handler');
+const {
+  addCategory,
+  updateCategory,
+  deleteCategory,
+  getCategories,
+  getCategoryById,
+} = require('../handlers/category-handler');
 const router = express.Router();
 
-router.post("", async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const model = req.body;
     const result = await addCategory(model);
@@ -13,16 +19,29 @@ router.post("", async (req, res) => {
     res.status(500).json({ error: 'Save failed' });
   }
 });
-router.get("/", async (req, res) => {
- let id= req.params["id"];
- let result=await getCategories();
- res.send(result);
+router.get('/', async (req, res) => {
+  try {
+    const result = await getCategories();
+    res.json(result);
+  } catch (err) {
+    console.error('GET /categories error:', err);
+    res.status(500).json({ error: 'Fetch failed' });
+  }
 });
-router.get("/:id",async(req,res)=>{
-  let id= req.params["id"];
-  let result=await getCategoryById(id);
-  res.send(result);
+
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await getCategoryById(req.params.id);
+    if (!result) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('GET /categories/:id error:', err);
+    res.status(500).json({ error: 'Fetch failed' });
+  }
 });
+
 router.put("/:id", async (req, res) => {
   try {
     const model = req.body;
@@ -35,10 +54,14 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: 'Update failed' });
   }
 });
-router.delete("/:id", async (req, res) => {
-  let id = req.params.id;
-  await deleteCategory(id);
-  res.send({ message: "Category deleted successfully" });
-})
+router.delete('/:id', async (req, res) => {
+  try {
+    await deleteCategory(req.params.id);
+    res.json({ message: 'Category deleted successfully' });
+  } catch (err) {
+    console.error('DELETE /categories/:id error:', err);
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
 
 module.exports = router;
