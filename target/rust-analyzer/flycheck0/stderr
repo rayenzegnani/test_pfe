@@ -1,14 +1,9 @@
     Updating crates.io index
-warning: spurious network error (3 tries remaining): [6] Could not resolve hostname (Could not resolve host: index.crates.io)
-warning: spurious network error (2 tries remaining): [6] Could not resolve hostname (Could not resolve host: index.crates.io)
-warning: spurious network error (1 try remaining): [6] Could not resolve hostname (Could not resolve host: index.crates.io)
-error: failed to get `reqwest` as a dependency of package `soapui_rust v0.1.0 (C:\Users\hamza\Documents\GitHub\test_pfe\soapui_rust)`
+error: failed to select a version for `reqwest`.
+    ... required by package `soapui_rust v0.1.0 (C:\Users\hamza\Documents\GitHub\test_pfe\soapui_rust)`
+versions that meet the requirements `^0.11` are: 0.11.27, 0.11.26, 0.11.25, 0.11.24, 0.11.23, 0.11.22, 0.11.21, 0.11.20, 0.11.19, 0.11.18, 0.11.17, 0.11.16, 0.11.15, 0.11.14, 0.11.13, 0.11.12, 0.11.11, 0.11.10, 0.11.9, 0.11.8, 0.11.7, 0.11.6, 0.11.5, 0.11.4, 0.11.3, 0.11.2, 0.11.1, 0.11.0
 
-Caused by:
-  download of config.json failed
+package `soapui_rust` depends on `reqwest` with feature `tcp-tls` but `reqwest` does not have that feature.
 
-Caused by:
-  failed to download from `https://index.crates.io/config.json`
 
-Caused by:
-  [6] Could not resolve hostname (Could not resolve host: index.crates.io)
+failed to select a version for `reqwest` which could resolve this conflict
