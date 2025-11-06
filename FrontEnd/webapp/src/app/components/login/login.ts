@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { inject } from '@angular/core';
+import { UserService } from '../../service/UserService';
 
 @Component({
   selector: 'app-login',
@@ -10,10 +12,13 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login implements OnInit {
+  userService = inject(UserService);
   loginForm!: FormGroup;
   showPassword = false;
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
+  loginType: 'user' | 'admin' = 'user';  // Default to user login
 
   constructor(
     private formBuilder: FormBuilder,
@@ -38,38 +43,71 @@ export class Login implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     const loginData = {
       email: this.loginForm.get('email')?.value,
-      password: this.loginForm.get('password')?.value,
-      rememberMe: this.loginForm.get('rememberMe')?.value
+      password: this.loginForm.get('password')?.value
     };
 
-    // TODO: Replace with actual authentication service call
-    // Example:
-    // this.authService.login(loginData).subscribe({
-    //   next: (response) => {
-    //     this.isLoading = false;
-    //     // Store token, user data, etc.
-    //     this.router.navigate(['/']);
-    //   },
-    //   error: (error) => {
-    //     this.isLoading = false;
-    //     this.errorMessage = error.error?.message || 'Invalid email or password';
-    //   }
-    // });
+    const rememberMe = this.loginForm.get('rememberMe')?.value;
 
-    // Temporary simulation (remove when implementing real authentication)
-    setTimeout(() => {
-      this.isLoading = false;
+    console.log('Attempting login:', { email: loginData.email, loginType: this.loginType });
+
+    this.userService.loginUser(loginData).subscribe({
+      next: (result: any) => {
+        console.log('Login successful:', result);
+        this.isLoading = false;
+
+        // Check if user has admin access when trying to login as admin
+        if (this.loginType === 'admin' && !result.user?.isAdmin) {
+          this.errorMessage = 'Access denied. You do not have administrator privileges.';
+          this.isLoading = false;
+          return;
+        }
+
+        this.successMessage = result.message || 'Login successful! Redirecting...';
+        
+        // Store user data in localStorage
+        if (result.user) {
+          localStorage.setItem('user', JSON.stringify(result.user));
+          localStorage.setItem('token', result.token);
+          localStorage.setItem('loginType', this.loginType);
+          
+          // Handle "Remember Me" functionality
+          if (rememberMe) {
+            localStorage.setItem('rememberMe', 'true');
+            localStorage.setItem('userEmail', loginData.email);
+          } else {
+            localStorage.removeItem('rememberMe');
+            localStorage.removeItem('userEmail');
+          }
+        }
+
       
-      // Simulate successful login
-      if (loginData.email === 'admin@example.com' && loginData.password === 'password') {
-        console.log('Login successful:', loginData);
-        this.router.navigate(['/admin/category']);
-      } else {
-        this.errorMessage = 'Invalid email or password. Try: admin@example.com / password';
+        setTimeout(() => {
+          if (this.loginType === 'admin' && result.user?.isAdmin) {
+            this.router.navigate(['/admin/category']);  
+          }
+          else if(this.loginType==='user' &&(result.user?.isAdmin==false) ){
+            this.router.navigate(['/']);
+          }
+        }, 1000);
+      },
+      error: (error: any) => {
+        console.error('Login error:', error);
+        this.isLoading = false;
+        
+        if (error.status === 401) {
+          this.errorMessage = 'Invalid email or password. Please try again.';
+        } else if (error.status === 400) {
+          this.errorMessage = error.error?.message || 'Please enter valid credentials.';
+        } else if (error.status === 0) {
+          this.errorMessage = 'Cannot connect to server. Please check if the backend is running on http://localhost:3000';
+        } else {
+          this.errorMessage = error.error?.message || 'Login failed. Please try again later.';
+        }
       }
-    }, 1500);
+    });
   }
 }

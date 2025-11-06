@@ -1,0 +1,135 @@
+<div class="p-6">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Users Management</h1>
+    <p class="text-gray-600 mt-2">Manage all registered users and their access levels</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+    </svg>
+    <span class="text-green-800">{{ successMessage }}</span>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+    </svg>
+    <span class="text-red-800">{{ errorMessage }}</span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+    <p class="mt-4 text-gray-600">Loading users...</p>
+  </div>
+
+  <!-- Users Table -->
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <tr>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">User</th>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Email</th>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Role</th>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Last Login</th>
+            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Joined</th>
+            <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngIf="users.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <p class="text-lg font-medium">No users found</p>
+            </td>
+          </tr>
+          
+          <tr *ngFor="let user of users" class="hover:bg-gray-50 transition-colors">
+            <!-- User Info with Avatar -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                  {{ getUserInitials(user.nom) }}
+                </div>
+                <div>
+                  <div class="font-medium text-gray-900">{{ user.nom }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Email -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ user.email }}</div>
+            </td>
+
+            <!-- Role Badge -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span *ngIf="user.isAdmin" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Admin
+              </span>
+              <span *ngIf="!user.isAdmin" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                </svg>
+                User
+              </span>
+            </td>
+
+            <!-- Last Login (using updatedAt) -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ getTimeSinceLastLogin(user.updatedAt) }}</div>
+              <div class="text-xs text-gray-500">{{ formatDate(user.updatedAt) }}</div>
+            </td>
+
+            <!-- Joined Date -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ formatDate(user.createdAt) }}</div>
+            </td>
+
+            <!-- Actions -->
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+              <button 
+                (click)="deleteUser(user._id, user.nom)"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm hover:shadow-md"
+                title="Delete user">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Footer with Stats -->
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          <span class="font-medium">{{ users.length }}</span> total user{{ users.length !== 1 ? 's' : '' }}
+        </div>
+        <div class="flex gap-4 text-sm">
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-purple-500"></div>
+            <span class="text-gray-600">{{ adminCount }} Admin{{ adminCount !== 1 ? 's' : '' }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-gray-400"></div>
+            <span class="text-gray-600">{{ regularUserCount }} User{{ regularUserCount !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -13,6 +13,7 @@ const brandRouter = require('./routes/brand');
 const productRouter = require('./routes/product');
 const customerRouter = require('./routes/customer');
 const authRouter = require('./routes/auth');
+<<<<<<< HEAD
 
 // Middlewares
 require('dotenv').config();
@@ -20,6 +21,9 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
   credentials: true,
 }));
+=======
+const userRouter = require('./routes/user');
+>>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
 app.use(express.json());
 app.use(cookieParser());
 
@@ -34,6 +38,16 @@ app.use('/brands', brandRouter);
 app.use('/products', authMiddleware, productRouter);
 app.use('/customers', customerRouter);
 app.use('/auth', authRouter);
+<<<<<<< HEAD
+=======
+app.use('/users', userRouter);
+async function connectDB() {
+  await mongoose.connect('mongodb://localhost:27017', {
+    dbName: 'SOA_project',
+  });
+  console.log('connected to DB');
+}
+>>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
 
 // Middleware de gestion d'erreurs global
 app.use((err, req, res, next) => {
