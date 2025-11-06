@@ -4,36 +4,12 @@ const { registerUser, loginUser, logout } = require('../handlers/auth-handler');
 const authMiddleware = require('../middleware/auth-middleware');
 const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 
-// ... La route /register reste la même ...
+// Route d'inscription (publique)
 router.post('/register', async (req, res) => {
     try {
-<<<<<<< HEAD
         const { nom, email, password, role } = req.body;
-        if (!nom || !email || !password) {
-            return res.status(400).json({ error: 'Name, email, and password are required' });
-        }
-        const userRole = (String(role).toLowerCase() === 'true');
-        await registerUser({ nom, email, password, role: userRole });
         
-        const result = await loginUser(email, password);
-        if (!result) {
-            return res.status(401).json({ error: 'Invalid credentials after registration' });
-        }
-
-        generateTokenAndSetCookie(res, result.user._id, result.user.email, result.user.role);
-
-        res.status(201).json({ message: 'User registered successfully', user: result.user });
-
-    } catch (err) {
-        console.error('REGISTER ERROR:', err.message);
-        if (err.message === 'Email already in use') {
-            return res.status(409).json({ error: err.message });
-        }
-        res.status(500).json({ error: 'Registration failed' });
-=======
-        const { nom, email, password, isAdmin } = req.body;
-        
-        console.log('Registration request:', { nom, email, hasPassword: !!password, isAdmin });
+        console.log('Registration request:', { nom, email, hasPassword: !!password, role });
         
         // Validate required fields
         if (!nom || !email || !password) {
@@ -43,18 +19,31 @@ router.post('/register', async (req, res) => {
             });
         }
         
-        const result = await registerUser({ nom, email, password, isAdmin });
+        const userRole = (String(role).toLowerCase() === 'true');
+        await registerUser({ nom, email, password, role: userRole });
         
+        const result = await loginUser(email, password);
+        if (!result) {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials after registration' 
+            });
+        }
+
+        // Génère le token et le place dans un cookie HttpOnly
+        generateTokenAndSetCookie(res, result.user._id, result.user.email, result.user.role);
+
         res.status(201).json({ 
             success: true,
             message: 'User registered successfully',
-            data: result
+            user: result.user
         });
+
     } catch (error) {
         console.error('Registration error:', error);
         
         // Handle duplicate key error
-        if (error.code === 11000) {
+        if (error.code === 11000 || error.message === 'Email already in use') {
             return res.status(409).json({ 
                 success: false,
                 message: 'A user with this email already exists' 
@@ -65,34 +54,13 @@ router.post('/register', async (req, res) => {
             success: false,
             message: error.message || 'Registration failed' 
         });
->>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
     }
 });
-
 
 // Route de connexion (publique)
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-<<<<<<< HEAD
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
-        }
-
-        const result = await loginUser(email, password);
-        if (!result) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-
-        // Génère le token et le place dans un cookie HttpOnly
-        generateTokenAndSetCookie(res, result.user._id, result.user.email, result.user.role);
-
-        res.status(200).json({ user: result.user }); // Ne retourne plus le token dans le JSON
-
-    } catch (err) {
-        console.error('LOGIN ERROR:', err);
-        res.status(500).json({ error: 'Login failed' });
-=======
         
         console.log('Login request:', { email });
         
@@ -111,11 +79,14 @@ router.post('/login', async (req, res) => {
                 message: 'Invalid credentials' 
             });
         }
+
+        // Génère le token et le place dans un cookie HttpOnly
+        generateTokenAndSetCookie(res, result.user._id, result.user.email, result.user.role);
         
         res.status(200).json({
             success: true,
             message: 'Login successful',
-            ...result
+            user: result.user
         });
     } catch (error) {
         console.error('Login error:', error);
@@ -123,7 +94,6 @@ router.post('/login', async (req, res) => {
             success: false,
             message: error.message || 'Login failed' 
         });
->>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
     }
 });
 
@@ -139,10 +109,16 @@ router.post('/logout', (req, res) => {
             httpOnly: true,
             expires: new Date(0),
         });
-        res.status(200).json({ message: 'Logged out successfully' });
-    } catch (err) {
-        console.error('LOGOUT ERROR:', err);
-        res.status(500).json({ error: 'Logout failed' });
+        res.status(200).json({ 
+            success: true,
+            message: 'Logged out successfully' 
+        });
+    } catch (error) {
+        console.error('LOGOUT ERROR:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Logout failed' 
+        });
     }
 });
 
