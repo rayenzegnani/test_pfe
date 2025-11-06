@@ -1,6 +1,6 @@
-<<<<<<< HEAD
+
 const { getFirestore, FieldValue } = require('../config/firebase');
-=======
+
 const mongoose = require('mongoose');
 const produitSchema = new mongoose.Schema({
     name :String,
@@ -13,7 +13,7 @@ const produitSchema = new mongoose.Schema({
     isFeatured:Boolean,
     isNewProduct:Boolean,
 });
->>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
+
 
 const db = getFirestore();
 

@@ -7,7 +7,7 @@ const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 // ... La route /register reste la même ...
 router.post('/register', async (req, res) => {
     try {
-<<<<<<< HEAD
+
         const { nom, email, password, role } = req.body;
         if (!nom || !email || !password) {
             return res.status(400).json({ error: 'Name, email, and password are required' });
@@ -30,7 +30,7 @@ router.post('/register', async (req, res) => {
             return res.status(409).json({ error: err.message });
         }
         res.status(500).json({ error: 'Registration failed' });
-=======
+
         const { nom, email, password, isAdmin } = req.body;
         
         console.log('Registration request:', { nom, email, hasPassword: !!password, isAdmin });
@@ -65,7 +65,7 @@ router.post('/register', async (req, res) => {
             success: false,
             message: error.message || 'Registration failed' 
         });
->>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
+
     }
 });
 
@@ -74,7 +74,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-<<<<<<< HEAD
+
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password are required' });
         }
@@ -92,7 +92,6 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error('LOGIN ERROR:', err);
         res.status(500).json({ error: 'Login failed' });
-=======
         
         console.log('Login request:', { email });
         
@@ -123,7 +122,7 @@ router.post('/login', async (req, res) => {
             success: false,
             message: error.message || 'Login failed' 
         });
->>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
+
     }
 });
 

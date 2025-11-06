@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 const { getFirestore, FieldValue } = require('../config/firebase');
 const db = getFirestore();
 
@@ -47,7 +47,6 @@ class User {
 }
 
 module.exports = User;
-=======
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -83,4 +82,4 @@ const userSchema = new mongoose.Schema({
 const userModel = mongoose.model("user", userSchema);
 
 module.exports = userModel;
->>>>>>> daa0281c080d8abdd830a479bb1786dd6a2efac1
+
