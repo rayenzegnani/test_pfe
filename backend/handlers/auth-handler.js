@@ -1,43 +1,34 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { getFirestore, FieldValue } = require('../config/firebase');
-
-const db = getFirestore();
-const JWT_SECRET = process.env.JWT_SECRET || 'un_secret_par_defaut_a_changer';
+const User = require('../db/user');
 
 const tokenBlacklist = new Set();
 
 async function registerUser(model) {
-    const hashedPassword = await bcrypt.hash(model.password, 10);
+  const existing = await User.findByEmail(model.email, { includeSensitive: true });
+  if (existing) throw new Error('Email already in use');
 
-    let newUser=new User({
-        nom:model.nom,
-        email:model.email,
-        password:hashedPassword,
+  const hashedPassword = await bcrypt.hash(model.password, 10);
 
+  const created = await User.create({
+    nom: model.nom,
+    email: model.email.trim().toLowerCase(),
+    password: hashedPassword,
+    role: !!model.role,
+  });
 
-    });
-    await newUser.save();
+  const { password: _pw, ...user } = created;
+  return user;
 }
 
 async function loginUser(email, password) {
-    const user = await User.findOne({ email });
-    if (!user) return null;
+  const user = await User.findByEmail(email.trim().toLowerCase(), { includeSensitive: true });
+  if (!user) return null;
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return null;
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return null;
 
-    // Génère un token JWT
-    const token = jwt.sign(
-        { userId: user._id, email: user.email },
-        JWT_SECRET,
-        { expiresIn: '1h' }
-    );
-
-    // Renvoie le token et l'utilisateur (sans password)
-    const userObj = user.toObject ? user.toObject() : JSON.parse(JSON.stringify(user));
-    delete userObj.password;
-    return { token, user: userObj };
+  const { password: _pw, ...clean } = user;
+  return clean;
 }
 
 function logout(token) {

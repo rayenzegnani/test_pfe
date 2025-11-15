@@ -1,85 +1,72 @@
-
 const { getFirestore, FieldValue } = require('../config/firebase');
+
 const db = getFirestore();
 
 class User {
-  static collection = db.collection('users');
+  static collection() {
+    return db.collection('users');
+  }
 
-  static async create({ nom, email, password, role = false }) {
-    const docRef = await this.collection.add({
-      nom,
-      email,
-      password,
-      role,
-      resetPasswordToken: null,
-      resetPasswordExpiresAt: null,
-      verificationToken: null,
-      verificationTokenExpiresAt: null,
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp()
+  static mapDoc(doc, { includeSensitive } = {}) {
+    if (!doc || !doc.exists) return null;
+    const data = doc.data();
+
+    const base = {
+      id: doc.id,
+      nom: data.nom,
+      email: data.email,
+      role: !!data.role,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+
+    if (includeSensitive) base.password = data.password;
+    return base;
+  }
+
+  static async create(data) {
+    const now = FieldValue.serverTimestamp();
+    const docRef = await this.collection().add({
+      nom: data.nom,
+      email: data.email,
+      password: data.password,
+      role: !!data.role,
+      createdAt: now,
+      updatedAt: now,
     });
-    return docRef.id;
+
+    const snapshot = await docRef.get();
+    return this.mapDoc(snapshot, { includeSensitive: true });
   }
 
-  static async findById(id) {
-    const doc = await this.collection.doc(id).get();
-    if (!doc.exists) return null;
-    return { id: doc.id, ...doc.data() };
+  static async findByEmail(email, options = {}) {
+    const snapshot = await this.collection().where('email', '==', email).limit(1).get();
+    if (snapshot.empty) return null;
+    return this.mapDoc(snapshot.docs[0], options);
   }
 
-  static async findByEmail(email) {
-    const snap = await this.collection.where('email', '==', email).get();
-    if (snap.empty) return null;
-    const doc = snap.docs[0];
-    return { id: doc.id, ...doc.data() };
+  static async findById(id, options = {}) {
+    const doc = await this.collection().doc(id).get();
+    return this.mapDoc(doc, options);
+  }
+
+  static async findAll() {
+    const snapshot = await this.collection().orderBy('createdAt', 'desc').get();
+    return snapshot.docs.map((doc) => this.mapDoc(doc));
   }
 
   static async update(id, data) {
-    data.updatedAt = FieldValue.serverTimestamp();
-    await this.collection.doc(id).update(data);
+    await this.collection().doc(id).update({
+      ...data,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
     return this.findById(id);
   }
 
   static async delete(id) {
-    await this.collection.doc(id).delete();
+    await this.collection().doc(id).delete();
     return true;
   }
 }
 
 module.exports = User;
-const mongoose = require('mongoose');
-
-const userSchema = new mongoose.Schema({
-  nom: {
-    type: String,
-    required: true,
-    unique: false  // Allow duplicate names
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,  // Emails must be unique
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false  // Default users are not admins
-  },
-  lastLogin: {
-    type: Date,
-    default: null
-  }
-}, { timestamps: true });
-
-// Don't create separate index - unique: true already creates one
-
-const userModel = mongoose.model("user", userSchema);
-
-module.exports = userModel;
-
