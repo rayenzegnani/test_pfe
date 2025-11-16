@@ -35,37 +35,7 @@ router.post('/register', async (req, res) => {
         
         console.log('Registration request:', { nom, email, hasPassword: !!password, isAdmin });
         
-        // Validate required fields
-        if (!nom || !email || !password) {
-            return res.status(400).json({ 
-                success: false,
-                message: 'Missing required fields (nom, email, password)' 
-            });
-        }
-        
-        const result = await registerUser({ nom, email, password, isAdmin });
-        
-        res.status(201).json({ 
-            success: true,
-            message: 'User registered successfully',
-            data: result
-        });
-    
-    } catch (error) {
-        console.error('Registration error:', error);
-        
-        // Handle duplicate key error
-        if (error.code === 11000) {
-            return res.status(409).json({ 
-                success: false,
-                message: 'A user with this email already exists' 
-            });
-        }
-        
-        res.status(500).json({ 
-            success: false,
-            message: error.message || 'Registration failed' 
-        });
+     
 
     }
 });
@@ -111,20 +81,14 @@ router.post('/login', async (req, res) => {
                 message: 'Invalid credentials' 
             });
         }
-        
-        res.status(200).json({
+              res.status(200).json({
             success: true,
             message: 'Login successful',
             ...result
         });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ 
-            success: false,
-            message: error.message || 'Login failed' 
-        });
-
-    }
+        
+  
+    } 
 });
 
 // Route de déconnexion (protégée)
