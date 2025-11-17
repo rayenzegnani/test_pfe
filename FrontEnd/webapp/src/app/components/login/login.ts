@@ -59,13 +59,6 @@ export class Login implements OnInit {
         console.log('Login successful:', result);
         this.isLoading = false;
 
-        // Check if user has admin access when trying to login as admin
-        if (this.loginType === 'admin' && !result.user?.isAdmin) {
-          this.errorMessage = 'Access denied. You do not have administrator privileges.';
-          this.isLoading = false;
-          return;
-        }
-
         this.successMessage = result.message || 'Login successful! Redirecting...';
         
         // Store user data in localStorage
@@ -84,12 +77,25 @@ export class Login implements OnInit {
           }
         }
 
-      
+        // Navigate based on user role
         setTimeout(() => {
-          if (this.loginType === 'admin' && result.user?.isAdmin) {
-            this.router.navigate(['/admin/category']);  
-          }
-          else if(this.loginType==='user' &&(result.user?.isAdmin==false) ){
+          console.log('User data:', result.user);
+          console.log('User role:', result.user?.role);
+          console.log('User isAdmin:', result.user?.isAdmin);
+          
+          const isUserAdmin = result.user?.role === true || result.user?.isAdmin === true;
+          console.log('Is user admin?', isUserAdmin);
+          
+          if (this.loginType === 'admin') {
+            if (isUserAdmin) {
+              console.log('Navigating to admin dashboard...');
+              this.router.navigate(['/admin/category']);
+            } else {
+              console.log('Admin access denied');
+              this.errorMessage = 'Access denied. You do not have administrator privileges.';
+            }
+          } else {
+            console.log('Navigating to home page...');
             this.router.navigate(['/']);
           }
         }, 1000);

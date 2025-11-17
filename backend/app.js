@@ -36,7 +36,7 @@ app.use('/brands', brandRouter);
 app.use('/products', authMiddleware, productRouter);
 app.use('/customers', customerRouter);
 app.use('/auth', authRouter);
-app.use('/users', userRouter);
+app.use('/users', authMiddleware, userRouter);
 
 app.use((err, req, res, next) => {
   console.error('Error:', err.stack);

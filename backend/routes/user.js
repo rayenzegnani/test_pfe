@@ -5,10 +5,8 @@ const User = require('../db/user');
 // Get all users
 router.get('/', async (req, res) => {
     try {
-        // Fetch all users, exclude password field, sort by most recent
-        const users = await User.find({})
-            .select('-password')
-            .sort({ updatedAt: -1 });
+        // Fetch all users from Firestore (password already excluded in mapDoc)
+        const users = await User.findAll();
         
         res.status(200).json({
             success: true,
@@ -27,7 +25,7 @@ router.get('/', async (req, res) => {
 // Get user by ID
 router.get('/:id', async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).select('-password');
+        const user = await User.findById(req.params.id);
         
         if (!user) {
             return res.status(404).json({
@@ -68,7 +66,7 @@ router.delete('/:id', async (req, res) => {
         // Prevent deleting your own account (optional safety check)
         // You can add JWT token verification here to check if the user is deleting themselves
         
-        await User.findByIdAndDelete(userId);
+        await User.delete(userId);
         
         res.status(200).json({
             success: true,

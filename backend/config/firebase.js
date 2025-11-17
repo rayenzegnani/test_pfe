@@ -9,17 +9,34 @@ function loadServiceAccount() {
   }
 
   const keyPath = path.join(__dirname, '..', 'serviceAccountKey.json');
-  // eslint-disable-next-line global-require, import/no-dynamic-require
-  return require(keyPath);
+  try {
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    const serviceAccount = require(keyPath);
+    console.log('✅ Service account loaded from:', keyPath);
+    console.log('📋 Project ID:', serviceAccount.project_id);
+    console.log('📧 Client Email:', serviceAccount.client_email);
+    return serviceAccount;
+  } catch (error) {
+    console.error('❌ Failed to load service account:', error.message);
+    throw new Error('Service account key file not found or invalid');
+  }
 }
 
 function initializeFirebase() {
   if (!admin.apps.length) {
-    const serviceAccount = loadServiceAccount();
+    try {
+      const serviceAccount = loadServiceAccount();
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
+      });
+      
+      console.log('✅ Firebase Admin SDK initialized successfully');
+    } catch (error) {
+      console.error('❌ Firebase initialization failed:', error.message);
+      throw error;
+    }
   }
 
   if (!db) {
@@ -27,6 +44,7 @@ function initializeFirebase() {
     db.settings({
       ignoreUndefinedProperties: true,
     });
+    console.log('✅ Firestore database connection established');
   }
 
   return db;

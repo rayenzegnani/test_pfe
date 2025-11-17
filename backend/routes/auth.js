@@ -6,8 +6,8 @@ const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 
 router.post('/register', async (req, res) => {
   try {
-    const { nom, email, password, role } = req.body;
-    console.log('Registration request:', { nom, email, hasPassword: !!password, role });
+    const { nom, email, password, role, isAdmin } = req.body;
+    console.log('Registration request:', { nom, email, hasPassword: !!password, role, isAdmin });
 
     if (!nom || !email || !password) {
       return res.status(400).json({
@@ -16,7 +16,16 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const userRole = String(role).toLowerCase() === 'true';
+    // Handle both 'role' and 'isAdmin' fields - convert to boolean
+    let userRole = false;
+    if (role !== undefined) {
+      userRole = role === true || String(role).toLowerCase() === 'true';
+    } else if (isAdmin !== undefined) {
+      userRole = isAdmin === true || String(isAdmin).toLowerCase() === 'true';
+    }
+    
+    console.log('Creating user with role:', userRole);
+    
     const user = await registerUser({ nom, email, password, role: userRole });
 
     const token = generateTokenAndSetCookie(res, user.id, user.email, user.role);

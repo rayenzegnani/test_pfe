@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable,inject } from '@angular/core';
 
 @Injectable({
@@ -10,6 +10,14 @@ export class UserService {
     private apiUrl = 'http://localhost:3000';
 
     constructor() {}
+
+    private getAuthHeaders(): HttpHeaders {
+      const token = localStorage.getItem('token');
+      return new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      });
+    }
 
     AddUser(userData: { fullName: string, email: string, password: string }){
        // Map fullName to nom for backend compatibility
@@ -26,15 +34,15 @@ export class UserService {
     }
 
     getAllUsers() {
-      return this.http.get(`${this.apiUrl}/users`);
+      return this.http.get(`${this.apiUrl}/users`, { headers: this.getAuthHeaders() });
     }
 
     getUserById(id: string) {
-      return this.http.get(`${this.apiUrl}/users/${id}`);
+      return this.http.get(`${this.apiUrl}/users/${id}`, { headers: this.getAuthHeaders() });
     }
 
     deleteUser(id: string) {
-      return this.http.delete(`${this.apiUrl}/users/${id}`);
+      return this.http.delete(`${this.apiUrl}/users/${id}`, { headers: this.getAuthHeaders() });
     }
 
  
