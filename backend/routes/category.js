@@ -7,9 +7,10 @@ const {
   getCategories,
   getCategoryById,
 } = require('../handlers/category-handler');
+const authMiddleware = require('../middleware/auth-middleware');
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const model = req.body;
     const result = await addCategory(model);
@@ -42,7 +43,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const model = req.body;
     const id = req.params.id;
@@ -54,7 +55,7 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: 'Update failed' });
   }
 });
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     await deleteCategory(req.params.id);
     res.json({ message: 'Category deleted successfully' });

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { ProductService } from '../../service/product';
 import { CategoriesService } from '../../service/categories';
+import { CartService } from '../../service/cart.service';
 
 @Component({
   selector: 'app-home',
@@ -13,16 +14,51 @@ import { CategoriesService } from '../../service/categories';
 })
 export class Home implements OnInit {
 
-  cartItemsCount = 1;
+  cartItemsCount = 0;
   products: any[] = [];
   categories: any[] = [];
+  isLoggedIn = false;
+  userName = '';
 
   productService = inject(ProductService);
   categoriesService = inject(CategoriesService);
+  cartService = inject(CartService);
+  router = inject(Router);
 
   ngOnInit(): void {
+    this.checkLoginStatus();
     this.loadProducts();
     this.loadCategories();
+    this.updateCartCount();
+  }
+
+  private updateCartCount(): void {
+    this.cartService.getCart().subscribe(() => {
+      this.cartItemsCount = this.cartService.getCartCount();
+    });
+  }
+
+  private checkLoginStatus(): void {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    this.isLoggedIn = !!token;
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.userName = userData.nom || userData.email || 'User';
+      } catch (e) {
+        this.userName = 'User';
+      }
+    }
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('loginType');
+    this.isLoggedIn = false;
+    this.userName = '';
+    this.router.navigate(['/login']);
   }
 
   private loadProducts(): void {
@@ -57,7 +93,8 @@ export class Home implements OnInit {
 
   addToCart(product: any) {
     console.log('Adding to cart:', product);
-    this.cartItemsCount++;
+    this.cartService.addToCart(product, 1);
+    alert(`${product.name} added to cart!`);
   }
 }
 

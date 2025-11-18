@@ -1,0 +1,55 @@
+<div class="collections-page">
+  <section class="collections-header">
+    <div class="container">
+      <h1>Products</h1>
+      <p>Browse all available products or narrow down by category.</p>
+    </div>
+  </section>
+
+  <section class="collections-filters">
+    <div class="container filter-list">
+      <button
+        type="button"
+        (click)="filterByCategory('all')"
+        [class.filter-active]="selectedCategory === 'all'">
+        All Products
+      </button>
+      <button
+        type="button"
+        *ngFor="let category of categories"
+        (click)="filterByCategory(category.id)"
+        [class.filter-active]="selectedCategory === category.id">
+        {{ category.name }}
+      </button>
+    </div>
+  </section>
+
+  <main class="container">
+    <div *ngIf="isLoading" class="state-message">Loading products…</div>
+    <div *ngIf="error && !isLoading" class="state-message error">{{ error }}</div>
+    <div *ngIf="!isLoading && !error && filteredProducts.length === 0" class="state-message">
+      No products found for the selected category.
+    </div>
+
+    <div *ngIf="!isLoading && !error && filteredProducts.length > 0" class="product-grid">
+      <article *ngFor="let product of filteredProducts" class="product-card">
+        <div class="product-image">
+          <img [src]="getProductImage(product)" [alt]="product.name" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'" />
+        </div>
+        <div class="product-body">
+          <span class="product-category">{{ getCategoryName(product.categoryId) }}</span>
+          <h2 class="product-title">{{ product.name }}</h2>
+          <div class="product-price">
+            <span *ngIf="product.discount > 0" class="price-discounted">
+              ${{ calculateDiscountedPrice(product.purchagePrice, product.discount).toFixed(2) }}
+            </span>
+            <span [class.line-through]="product.discount > 0">
+              ${{ product.purchagePrice?.toFixed(2) }}
+            </span>
+          </div>
+          <button type="button" (click)="addToCart(product)">Add to cart</button>
+        </div>
+      </article>
+    </div>
+  </main>
+</div>

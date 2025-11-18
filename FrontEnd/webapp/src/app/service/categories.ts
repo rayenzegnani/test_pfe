@@ -21,14 +21,14 @@ export class CategoriesService {
     });
   }
   getCategories(){
-    return this.http.get("http://localhost:3000/categories", { headers: this.getAuthHeaders() });
+    return this.http.get("http://localhost:3000/categories");
   }
   // Send plain JSON with category fields (backend expects JSON)
   createCategory(categoryData: { name: string }){
      return this.http.post("http://localhost:3000/categories", categoryData, { headers: this.getAuthHeaders() });
   }
   getCategoriesById(id:string){
-    return this.http.get(`http://localhost:3000/categories/${id}`, { headers: this.getAuthHeaders() });
+    return this.http.get(`http://localhost:3000/categories/${id}`);
   }
     UpdateCategory(categoryData: { name: string,id:string }){
      const { id, name } = categoryData;

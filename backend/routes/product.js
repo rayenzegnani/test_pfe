@@ -6,10 +6,11 @@ const {
   getProductById,
   getProducts,
 } = require('../handlers/product-handler');
+const authMiddleware = require('../middleware/auth-middleware');
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const result = await addProduct(req.body);
     res.status(201).json(result);
@@ -42,7 +43,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const updated = await updateProduct(req.params.id, req.body);
     if (!updated) {
@@ -55,7 +56,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     await deleteProduct(req.params.id);
     res.json({ message: 'Product deleted successfully' });

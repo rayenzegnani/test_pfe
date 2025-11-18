@@ -31,9 +31,9 @@ app.get('/', (req, res) => {
   res.send('Server is running with Firebase');
 });
 
-app.use('/categories', authMiddleware, categoryRouter);
-app.use('/brands', authMiddleware, brandRouter);
-app.use('/products', authMiddleware, productRouter);
+app.use('/categories', categoryRouter);
+app.use('/brands', brandRouter);
+app.use('/products', productRouter);
 app.use('/customers', customerRouter);
 app.use('/auth', authRouter);
 app.use('/users', authMiddleware, userRouter);

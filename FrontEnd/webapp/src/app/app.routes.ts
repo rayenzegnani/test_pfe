@@ -11,11 +11,15 @@ import { Dashbord } from './components/manage/dashbord/dashbord';
 import { Income } from './components/manage/income/income';
 import { User } from './components/manage/user/user';
 import { Settings } from './components/manage/settings/settings';
+import { Collections } from './components/collections/collections';
+import { Cart } from './components/cart/cart';
 
 export const routes: Routes = [
     { path: '', component: Home },
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
+    { path: 'collections', component: Collections },
+    { path: 'cart', component: Cart },
     {
         path: 'admin',
         component: AdminLayout,

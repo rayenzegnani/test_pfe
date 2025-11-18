@@ -24,12 +24,12 @@ export class ProductService {
 
   getProducts(): Observable<any> {
     console.log('📦 Fetching products...');
-    return this.http.get(this.apiUrl, { headers: this.getAuthHeaders() });
+    return this.http.get(this.apiUrl);
   }
 
   getProductById(id: string): Observable<any> {
     console.log('📦 Fetching product by ID:', id);
-    return this.http.get(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
+    return this.http.get(`${this.apiUrl}/${id}`);
   }
 
   addProduct(product: any): Observable<any> {
