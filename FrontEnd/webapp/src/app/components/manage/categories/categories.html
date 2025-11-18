@@ -64,7 +64,7 @@
             *matCellDef="let row" 
             class="px-4 py-3 text-gray-600 border-t border-gray-200">
           <button mat-raised-button color="accent" [routerLink]="['/admin/category', row._id || row.id]">Edit</button>
-          <button mat-raised-button color="warn" (click)="Delete(row._id)">Delete</button> 
+          <button mat-raised-button color="warn" (click)="Delete(row._id || row.id)">Delete</button> 
         </td>
       </ng-container>
 

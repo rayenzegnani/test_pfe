@@ -32,10 +32,24 @@ constructor() {
 
 }
 Delete(row_id:string){
-  this.categoryService.DeletCategory(row_id).subscribe((data:any)=>{
-    console.log("deleted",data);
-    alert("category Deleted");
-    this.getServerData();
+  if (!row_id) {
+    console.error('No ID provided for deletion');
+    alert('Error: Category ID is missing');
+    return;
+  }
+  
+  console.log('Deleting category with ID:', row_id);
+  
+  this.categoryService.DeletCategory(row_id).subscribe({
+    next: (data:any) => {
+      console.log("Category deleted successfully", data);
+      alert("Category Deleted");
+      this.getServerData();
+    },
+    error: (error:any) => {
+      console.error('Error deleting category:', error);
+      alert(`Failed to delete category: ${error.error?.message || error.message}`);
+    }
   });
 }
 

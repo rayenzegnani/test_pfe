@@ -91,12 +91,20 @@ export class Login implements OnInit {
               console.log('Navigating to admin dashboard...');
               this.router.navigate(['/admin/category']);
             } else {
-              console.log('Admin access denied');
+              console.log('Admin access denied - user account cannot login as admin');
               this.errorMessage = 'Access denied. You do not have administrator privileges.';
+              localStorage.clear();
             }
           } else {
-            console.log('Navigating to home page...');
-            this.router.navigate(['/']);
+            // User login - check that they're NOT an admin
+            if (isUserAdmin) {
+              console.log('User login denied - admin account cannot login as user');
+              this.errorMessage = 'Please use the Admin login for administrator accounts.';
+              localStorage.clear();
+            } else {
+              console.log('Navigating to home page...');
+              this.router.navigate(['/']);
+            }
           }
         }, 1000);
       },
