@@ -1,6 +1,6 @@
     Updating crates.io index
 error: failed to select a version for `reqwest`.
-    ... required by package `soapui_rust v0.1.0 (C:\Users\hamza\Documents\GitHub\test_pfe\soapui_rust)`
+    ... required by package `soapui_rust v0.1.0 (C:\Users\RAYEN\Documents\GitHub\test_pfe\soapui_rust)`
 versions that meet the requirements `^0.11` are: 0.11.27, 0.11.26, 0.11.25, 0.11.24, 0.11.23, 0.11.22, 0.11.21, 0.11.20, 0.11.19, 0.11.18, 0.11.17, 0.11.16, 0.11.15, 0.11.14, 0.11.13, 0.11.12, 0.11.11, 0.11.10, 0.11.9, 0.11.8, 0.11.7, 0.11.6, 0.11.5, 0.11.4, 0.11.3, 0.11.2, 0.11.1, 0.11.0
 
 package `soapui_rust` depends on `reqwest` with feature `tcp-tls` but `reqwest` does not have that feature.

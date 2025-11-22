@@ -1,5 +1,5 @@
 const { getFirestore, FieldValue } = require('../config/firebase');
-
+const bcrypt = require('bcryptjs');
 const db = getFirestore();
 
 class User {
@@ -66,6 +66,31 @@ class User {
   static async delete(id) {
     await this.collection().doc(id).delete();
     return true;
+  }
+
+  static async setAdminInvite({ email, code }) {
+    if (!email) throw new Error('Email is required for admin invite');
+
+    const hashedCode = await bcrypt.hash(code, 10);
+    const snapshot = await this.collection().where('email', '==', email).limit(1).get();
+
+    if (snapshot.empty) {
+      const now = FieldValue.serverTimestamp();
+      await this.collection().add({
+        email,
+        role: true,
+        password: hashedCode,
+        createdAt: now,
+        updatedAt: now,
+      });
+      return;
+    }
+
+    await snapshot.docs[0].ref.update({
+      role: true,
+      password: hashedCode,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
   }
 }
 

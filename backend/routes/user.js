@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../db/user');
-
+const  userHandler  = require('../handlers/user-handler');
+const authMiddleware = require('../middleware/auth-middleware');
+const adminCheck = require('../middleware/admin-check');
 // Get all users
 router.get('/', async (req, res) => {
     try {
@@ -47,6 +49,7 @@ router.get('/:id', async (req, res) => {
         });
     }
 });
+router.post('/invite-admin', authMiddleware, adminCheck, userHandler.inviteAdmin);
 
 // Delete user by ID
 router.delete('/:id', async (req, res) => {
