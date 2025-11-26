@@ -1,20 +1,20 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../service/UserService';
 
 interface UserData {
-  _id: string;
+  id: string;
   nom: string;
   email: string;
-  isAdmin: boolean;
-  lastLogin: string | null;
-  createdAt: string;
-  updatedAt: string;
+  role: boolean;
+  createdAt: any;
+  updatedAt: any;
 }
 
 @Component({
   selector: 'app-user',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './user.html',
   styleUrl: './user.scss'
 })
@@ -24,6 +24,9 @@ export class User implements OnInit {
   loading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  showAddAdminDialog: boolean = false;
+  newAdminEmail: string = '';
+  inviting: boolean = false;
 
   ngOnInit(): void {
     this.loadUsers();
@@ -76,8 +79,19 @@ export class User implements OnInit {
     }
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
+  formatDate(timestamp: any): string {
+    if (!timestamp) return 'N/A';
+    
+    // Handle Firestore Timestamp object
+    let date: Date;
+    if (timestamp && timestamp._seconds) {
+      date = new Date(timestamp._seconds * 1000);
+    } else if (timestamp && timestamp.seconds) {
+      date = new Date(timestamp.seconds * 1000);
+    } else {
+      date = new Date(timestamp);
+    }
+    
     return date.toLocaleString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -87,9 +101,20 @@ export class User implements OnInit {
     });
   }
 
-  getTimeSinceLastLogin(updatedAt: string): string {
+  getTimeSinceLastLogin(timestamp: any): string {
+    if (!timestamp) return 'Never';
+    
+    // Handle Firestore Timestamp object
+    let loginDate: Date;
+    if (timestamp && timestamp._seconds) {
+      loginDate = new Date(timestamp._seconds * 1000);
+    } else if (timestamp && timestamp.seconds) {
+      loginDate = new Date(timestamp.seconds * 1000);
+    } else {
+      loginDate = new Date(timestamp);
+    }
+    
     const now = new Date();
-    const loginDate = new Date(updatedAt);
     const diffMs = now.getTime() - loginDate.getTime();
     
     const diffMins = Math.floor(diffMs / 60000);
@@ -101,7 +126,7 @@ export class User implements OnInit {
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
     
-    return this.formatDate(updatedAt);
+    return this.formatDate(timestamp);
   }
 
   getUserInitials(name: string): string {
@@ -113,10 +138,52 @@ export class User implements OnInit {
   }
 
   get adminCount(): number {
-    return this.users.filter(user => user.isAdmin).length;
+    return this.users.filter(user => user.role).length;
   }
 
   get regularUserCount(): number {
-    return this.users.filter(user => !user.isAdmin).length;
+    return this.users.filter(user => !user.role).length;
+  }
+
+  openAddAdminDialog(): void {
+    this.showAddAdminDialog = true;
+    this.newAdminEmail = '';
+    this.errorMessage = '';
+  }
+
+  closeAddAdminDialog(): void {
+    this.showAddAdminDialog = false;
+    this.newAdminEmail = '';
+    this.inviting = false;
+  }
+
+  inviteAdmin(): void {
+    if (!this.newAdminEmail || !this.newAdminEmail.includes('@')) {
+      this.errorMessage = 'Please enter a valid email address';
+      return;
+    }
+
+    this.inviting = true;
+    this.errorMessage = '';
+
+    this.userService.inviteAdmin(this.newAdminEmail).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.successMessage = `Admin invitation sent to ${this.newAdminEmail}. Password has been emailed.`;
+          this.closeAddAdminDialog();
+          this.loadUsers(); // Reload users list
+          
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 5000);
+        }
+        this.inviting = false;
+      },
+      error: (error) => {
+        console.error('Error inviting admin:', error);
+        this.errorMessage = error.error?.message || 'Failed to invite admin. Please try again.';
+        this.inviting = false;
+      }
+    });
   }
 }

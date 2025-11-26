@@ -1,8 +1,18 @@
 <div class="p-6">
   <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Users Management</h1>
-    <p class="text-gray-600 mt-2">Manage all registered users and their access levels</p>
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800">Users Management</h1>
+      <p class="text-gray-600 mt-2">Manage all registered users and their access levels</p>
+    </div>
+    <button 
+      (click)="openAddAdminDialog()"
+      class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+      </svg>
+      Add Admin
+    </button>
   </div>
 
   <!-- Success Message -->
@@ -71,13 +81,13 @@
 
             <!-- Role Badge -->
             <td class="px-6 py-4 whitespace-nowrap">
-              <span *ngIf="user.isAdmin" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+              <span *ngIf="user.role" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                 </svg>
                 Admin
               </span>
-              <span *ngIf="!user.isAdmin" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+              <span *ngIf="!user.role" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                 </svg>
@@ -99,7 +109,7 @@
             <!-- Actions -->
             <td class="px-6 py-4 whitespace-nowrap text-center">
               <button 
-                (click)="deleteUser(user._id, user.nom)"
+                (click)="deleteUser(user.id, user.nom)"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm hover:shadow-md"
                 title="Delete user">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,6 +139,53 @@
             <span class="text-gray-600">{{ regularUserCount }} User{{ regularUserCount !== 1 ? 's' : '' }}</span>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Admin Dialog -->
+  <div *ngIf="showAddAdminDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">Add New Admin</h2>
+        <button 
+          (click)="closeAddAdminDialog()"
+          class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-gray-600 mb-6">Enter the email address for the new admin. A password will be generated and sent to their email.</p>
+
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+        <input 
+          type="email" 
+          [(ngModel)]="newAdminEmail"
+          placeholder="admin@example.com"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          [disabled]="inviting">
+      </div>
+
+      <div class="flex gap-3">
+        <button 
+          (click)="closeAddAdminDialog()"
+          [disabled]="inviting"
+          class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Cancel
+        </button>
+        <button 
+          (click)="inviteAdmin()"
+          [disabled]="inviting || !newAdminEmail"
+          class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <svg *ngIf="inviting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{{ inviting ? 'Sending...' : 'Send Invitation' }}</span>
+        </button>
       </div>
     </div>
   </div>

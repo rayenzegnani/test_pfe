@@ -45,5 +45,9 @@ export class UserService {
       return this.http.delete(`${this.apiUrl}/users/${id}`, { headers: this.getAuthHeaders() });
     }
 
+    inviteAdmin(email: string) {
+      return this.http.post(`${this.apiUrl}/users/invite-admin`, { email }, { headers: this.getAuthHeaders() });
+    }
+
  
 }
